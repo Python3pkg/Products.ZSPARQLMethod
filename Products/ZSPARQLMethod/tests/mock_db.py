@@ -1,6 +1,6 @@
 import pycurl2 as pycurl
 from os import path
-from StringIO import StringIO
+from io import StringIO
 from mock import Mock, patch
 
 GET_LANGS = """\
@@ -53,7 +53,7 @@ class MockCurl(object):
 
     def perform(self):
         try:
-            from urlparse import parse_qs
+            from urllib.parse import parse_qs
         except ImportError:
             from cgi import parse_qs
         querystring = self.url.split('?', 1)[1]

@@ -7,7 +7,7 @@ except ImportError:
 
 def initialize(context):
     from AccessControl.Permissions import view_management_screens
-    import Method
+    from . import Method
     context.registerClass(
         Method.ZSPARQLMethod,
         permission=view_management_screens,

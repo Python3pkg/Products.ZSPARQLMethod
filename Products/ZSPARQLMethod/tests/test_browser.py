@@ -1,8 +1,8 @@
 import unittest
 from mock import Mock, patch
 import wsgi_intercept.mechanize_intercept
-from zope_wsgi import WsgiApp, css, csstext, parse_html
-import mock_db
+from .zope_wsgi import WsgiApp, css, csstext, parse_html
+from . import mock_db
 
 
 class BrowserTest(unittest.TestCase):
@@ -12,7 +12,7 @@ class BrowserTest(unittest.TestCase):
         self.method = ZSPARQLMethod('sq', "Test Method", "")
         self.method.endpoint_url = "http://cr.eionet.europa.eu/sparql"
         self.method.query = mock_db.GET_LANG_BY_NAME
-        self.method.arg_spec = u"lang_name:string"
+        self.method.arg_spec = "lang_name:string"
 
         self.app = WsgiApp(self.method)
 
@@ -49,7 +49,7 @@ class BrowserTest(unittest.TestCase):
 
     def test_query_test_page(self):
         self.method.query = mock_db.GET_LANG_NAMES
-        self.method.arg_spec = u""
+        self.method.arg_spec = ""
         br = self.browser
         page = parse_html(br.open('http://test/test_html').read())
         table = css(page, 'table.sparql-results')[0]
@@ -71,7 +71,7 @@ class BrowserTest(unittest.TestCase):
         page = parse_html(br.submit().read())
 
         self.assertEqual(csstext(page, 'table.sparql-results tbody td'),
-                         u"<http://rdfdata.eionet.europa.eu/eea/languages/da>")
+                         "<http://rdfdata.eionet.europa.eu/eea/languages/da>")
 
     def test_autofill_submitted_argument(self):
         br = self.browser
@@ -87,7 +87,7 @@ class BrowserTest(unittest.TestCase):
         from webob import Request
         import sparql
         from Products.ZSPARQLMethod._depend import json
-        from test_method import EIONET_RDF
+        from .test_method import EIONET_RDF
 
         req = Request.blank('http://test/?lang_name=Danish')
         response = req.get_response(self.app)

@@ -1,6 +1,6 @@
 import sys
 from time import time
-from _depend import json
+from ._depend import json
 from datetime import datetime
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from App.class_init import InitializeClass
@@ -199,7 +199,7 @@ def query_and_get_result(*args, **kwargs):
     """
     result = sparql.query(*args, timeout = kwargs.get("timeout", 0))
     return {
-        'var_names': [unicode(name) for name in result.variables],
+        'var_names': [str(name) for name in result.variables],
         'rows': result.fetchall(),
         'has_result': result._hasResult,
     }
@@ -258,11 +258,11 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     result = {}
     try:
         ret = func(*args, **kwargs)
-    except sparql.SparqlException, e:
+    except sparql.SparqlException as e:
         if e.code == 28:
             raise QueryTimeout
         result['exception'] = e.message
-    except Exception, e:
+    except Exception as e:
         result['exception'] = traceback.format_exc()
     else:
         result['result'] = ret
@@ -321,7 +321,7 @@ def map_arg_values(arg_spec, arg_data):
     """
     arg_values = {}
     missing = []
-    for name, factory in arg_spec.iteritems():
+    for name, factory in arg_spec.items():
         if name in arg_data:
             arg_values[name] = factory(arg_data[name])
         else:
@@ -336,7 +336,7 @@ def interpolate_query(query_spec, var_data):
     variables, and its values are assumed to be `sparql.RDFTerm` instances.
     """
     from string import Template
-    var_strings = dict( (k, v.n3()) for (k, v) in var_data.iteritems() )
+    var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     return Template(query_spec).substitute(**var_strings)
 
 def html_quote(s):
@@ -349,7 +349,7 @@ def interpolate_query_html(query_spec, var_data):
     place.
     """
     from string import Template
-    var_strings = dict( (k, v.n3()) for (k, v) in var_data.iteritems() )
+    var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     tmpl = Template(html_quote(query_spec))
     def convert(mo): # Simplified version of Template's helper function
         named = mo.group('named') or mo.group('braced')

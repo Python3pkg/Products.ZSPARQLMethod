@@ -1,5 +1,5 @@
 import sys
-from StringIO import StringIO
+from io import StringIO
 
 from ZServer.HTTPResponse import ZServerHTTPResponse
 from ZPublisher.Request import Request

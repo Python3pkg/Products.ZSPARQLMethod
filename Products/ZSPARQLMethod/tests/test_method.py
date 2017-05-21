@@ -1,6 +1,6 @@
 import unittest
 from mock import Mock, patch
-import mock_db
+from . import mock_db
 
 import sparql
 
@@ -71,7 +71,7 @@ class QueryTest(unittest.TestCase):
 
         result = self.method.execute()
         if MyError.__name__ not in result['exception']:
-            raise self.failureException, "%s not raised" % MyError.__name__
+            raise self.failureException("%s not raised" % MyError.__name__)
 
     def test_query_with_arguments(self):
         self.method.query = mock_db.GET_LANG_BY_NAME
@@ -82,7 +82,7 @@ class QueryTest(unittest.TestCase):
 
     def test_call(self):
         self.method.query = mock_db.GET_LANG_BY_NAME
-        self.method.arg_spec = u"lang_name:n3term"
+        self.method.arg_spec = "lang_name:n3term"
         result = self.method(lang_name='"Danish"')
 
         self.assertEqual(result[0], [EIONET_RDF+'/languages/da'])
@@ -95,46 +95,46 @@ class MapArgumentsTest(unittest.TestCase):
         missing, result = map_arg_values(parse_arg_spec(raw_arg_spec), arg_data)
         self.assertEqual(missing, [])
         self.assertEqual(result, expected)
-        self.assertEqual(map(type, result.values()),
-                         map(type, expected.values()))
+        self.assertEqual(list(map(type, list(result.values()))),
+                         list(map(type, list(expected.values()))))
 
     def test_map_zero(self):
-        self._test(u'', (), {})
+        self._test('', (), {})
 
     def test_map_one_iri(self):
         en = EIONET_RDF + '/languages/en'
-        self._test(u'lang_url:iri',
+        self._test('lang_url:iri',
                    {'lang_url': en},
                    {'lang_url': sparql.IRI(en)})
 
     def test_map_one_parsed_iri(self):
         en = EIONET_RDF + '/languages/en'
-        self._test(u'lang_url:n3term',
+        self._test('lang_url:n3term',
                    {'lang_url': '<%s>' % en},
                    {'lang_url': sparql.IRI(en)})
 
     def test_map_one_literal(self):
-        self._test(u'name:string',
-                   {'name': u"Joe"},
-                   {'name': sparql.Literal(u"Joe")})
+        self._test('name:string',
+                   {'name': "Joe"},
+                   {'name': sparql.Literal("Joe")})
 
     def test_map_one_float(self):
         en = EIONET_RDF + '/languages/en'
-        self._test(u'lang_url:float',
+        self._test('lang_url:float',
                    {'lang_url': '1.23'},
                    {'lang_url': sparql.Literal('1.23', sparql.XSD_FLOAT)})
 
     def test_map_one_parsed_typed_literal(self):
         en = EIONET_RDF + '/languages/en'
-        self._test(u'lang_url:n3term',
+        self._test('lang_url:n3term',
                    {'lang_url': '"12:33"^^<'+sparql.XSD_TIME+'>'},
                    {'lang_url': sparql.Literal('12:33', sparql.XSD_TIME)})
 
     def test_map_two_values(self):
         en = EIONET_RDF + '/languages/en'
-        self._test(u'name:string lang_url:n3term',
-                   {'name': u"Joe", 'lang_url': '<%s>' % en},
-                   {'name': sparql.Literal(u"Joe"),
+        self._test('name:string lang_url:n3term',
+                   {'name': "Joe", 'lang_url': '<%s>' % en},
+                   {'name': sparql.Literal("Joe"),
                     'lang_url': sparql.IRI(en)})
 
 class InterpolateQueryTest(unittest.TestCase):
@@ -145,20 +145,20 @@ class InterpolateQueryTest(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_no_variables(self):
-        self._test(u"SELECT * WHERE { ?s ?p ?u }",
+        self._test("SELECT * WHERE { ?s ?p ?u }",
                    {},
-                   u"SELECT * WHERE { ?s ?p ?u }")
+                   "SELECT * WHERE { ?s ?p ?u }")
 
     def test_one_iri(self):
         onto_name = EIONET_RDF + '/ontology/name'
-        self._test(u'SELECT * WHERE { ?s ${pred} "Joe" }',
+        self._test('SELECT * WHERE { ?s ${pred} "Joe" }',
                    {'pred': sparql.IRI(onto_name)},
-                   u'SELECT * WHERE { ?s <%s> "Joe" }' % onto_name)
+                   'SELECT * WHERE { ?s <%s> "Joe" }' % onto_name)
 
     def test_one_literal(self):
-        self._test(u"SELECT * WHERE { ?s ?p ${value} }",
+        self._test("SELECT * WHERE { ?s ?p ${value} }",
                    {'value': sparql.Literal("Joe")},
-                   u'SELECT * WHERE { ?s ?p "Joe" }')
+                   'SELECT * WHERE { ?s ?p "Joe" }')
 
 class CachingTest(unittest.TestCase):
 
@@ -182,7 +182,7 @@ class CachingTest(unittest.TestCase):
     def test_cached_queries(self, mock_query):
         onto_name = EIONET_RDF + '/ontology/name'
         self.method.query = "SELECT * WHERE {$subject <%s> ?value}" % onto_name
-        self.method.arg_spec = u"subject:iri"
+        self.method.arg_spec = "subject:iri"
         mock_query.return_value = {
             'rows': [], 'var_names': [], 'has_result': True}
 

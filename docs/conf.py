@@ -10,8 +10,8 @@ source_suffix = '.rst'
 
 master_doc = 'index'
 
-project = u'ZSPARQLMethod'
-copyright = u'2011, Eau de Web'
+project = 'ZSPARQLMethod'
+copyright = '2011, Eau de Web'
 
 from Products.ZSPARQLMethod import __version__ as version
 release = version
